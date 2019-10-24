@@ -31,6 +31,12 @@ namespace VippsCaseAPI.Controllers
             configuration = iConfig;
         }
 
+        [HttpGet("config")]
+        public async Task<ActionResult> Config()
+        {
+            return Ok(configuration.GetSection("Secret").Value);
+        }
+
         [HttpPost("createUser")]
         public async Task<ActionResult> CreateUser([FromBody]JObject data)
         {
@@ -132,7 +138,8 @@ namespace VippsCaseAPI.Controllers
 
         private string generateToken(User user)
         {
-            var key = Encoding.UTF8.GetBytes("super_secret_key_6060JK");
+            string secret = configuration.GetSection("Secret").Value;
+            var key = Encoding.UTF8.GetBytes(secret);
 
             var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature);
 
