@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using VippsCaseAPI.DataAccess;
@@ -22,10 +23,12 @@ namespace VippsCaseAPI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly DBContext _context;
+        private IConfiguration configuration;
 
-        public AuthController(DBContext context)
+        public AuthController(DBContext context, IConfiguration iConfig)
         {
             _context = context;
+            configuration = iConfig;
         }
 
         [HttpPost("createUser")]
@@ -105,7 +108,8 @@ namespace VippsCaseAPI.Controllers
 
         private string generateAnonymousToken()
         {
-            var key = Encoding.UTF8.GetBytes("super_secret_key_6060JK");
+            string secret = configuration.GetSection("Secret").Value;
+            var key = Encoding.UTF8.GetBytes(secret);
 
             var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature);
 
